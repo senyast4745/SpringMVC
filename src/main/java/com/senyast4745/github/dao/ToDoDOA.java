@@ -2,18 +2,16 @@ package com.senyast4745.github.dao;
 
 
 import com.senyast4745.github.model.ToDo;
-import org.springframework.boot.web.server.AbstractConfigurableWebServerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 //Create only one exemplar (like singleton) так что нужно обратиться к этому компоненте  использовать Autowired
 @Component
 public class ToDoDOA {
-    //private static final String template = "ToDo #%d";
-    private static List<ToDo> allToDos = new ArrayList<>();
+    //private static final String template = "oDo #%d";
+    private static ConcurrentLinkedDeque<ToDo> allToDos = new ConcurrentLinkedDeque<>();
     private final AtomicLong counter = new AtomicLong();
 
     public ToDo create(String description) {
@@ -58,7 +56,7 @@ public class ToDoDOA {
         }
     }
 
-    public List<ToDo> showAll() {
+    public ConcurrentLinkedDeque<ToDo> showAll() {
         return allToDos;
     }
 

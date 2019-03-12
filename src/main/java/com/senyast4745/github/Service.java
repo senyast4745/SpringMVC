@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 @Controller
 public class Service {
@@ -40,7 +40,7 @@ public class Service {
     // и по callback вызывется нужный метод
 
     @RequestMapping("/hw2")
-    public String indexFuck() {
+    public String indexSecond() {
         return "index2";
     }
     //http://localhost:8080/create?description=12 -
@@ -48,12 +48,12 @@ public class Service {
     // запрос по GET (нельзя изменять структуру сервера, небезопасно)
    /* @RequestMapping ("/create")
     public @ResponseBody
-    ToDo create(@RequestParam String description){
+    oDo create(@RequestParam String description){
         return dao.create(description);
     }*/
 
     //http по POST
-    @RequestMapping(value = "/create", method = RequestMethod.GET)
+    @RequestMapping(value = "/create", method = RequestMethod.POST)
     public @ResponseBody
     ToDo create(@RequestParam String description) {
         return dao.create(description);
@@ -68,7 +68,7 @@ public class Service {
         throw new IllegalArgumentException("toDo with id=" + " not exists");
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
     public @ResponseBody
     String delete(@RequestParam long id) {
         if (!dao.delete(id)) {
@@ -77,7 +77,7 @@ public class Service {
         return "200 OK";
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.GET)
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
     public @ResponseBody
     ToDo update(@RequestParam long id, @RequestParam String description) {
         ToDo toDo = dao.update(id, description);
@@ -89,11 +89,11 @@ public class Service {
 
     @RequestMapping(value = "/showAll", method = RequestMethod.GET)
     public @ResponseBody
-    List<ToDo> showAll() {
+    ConcurrentLinkedDeque<ToDo> showAll() {
         return dao.showAll();
     }
 
-    @RequestMapping(value = "/clearAll", method = RequestMethod.GET)
+    @RequestMapping(value = "/clearAll", method = RequestMethod.POST)
     public @ResponseBody
     String clearAll() {
         if (dao.clearList())
