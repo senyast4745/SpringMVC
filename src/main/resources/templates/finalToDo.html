@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo</title>
+    <link rel="stylesheet" href="../static/styles/default.css" />
+</head>
+<body>
+
+<div class="main-layout">
+
+    <h1 class="todo-title">Todos</h1>
+
+    <div class="todo-board __has-content">
+
+        <form class="todo-creator">
+            <button class="todo-creator_check-all" aria-label="Check all items as done"></button>
+            <div class="todo-creator_text-input-w">
+                <input class="todo-creator_text-input" type="text"  placeholder="New todo name" aria-label="Input new todo text" />
+            </div>
+        </form>
+
+        <div class="todos-list">
+            <div class="todos-list_item">
+                <div class="custom-checkbox todos-list_item_ready-marker">
+                    <input type="checkbox" class="custom-checkbox_target" aria-label="Mark todo as ready" />
+                    <div class="custom-checkbox_visual">
+                        <div class="custom-checkbox_visual_icon"></div>
+                    </div>
+                </div>
+                    <div class="todos-list_item_text-w">
+                        <div class="todos-list_item_text" contenteditable="true">HTML</div>
+                    </div>
+                <div class = "todos-list_item_remove-action">
+                    <div class = "todos-list_item_remove-action-fix">
+                        <buttom class="todos-list_item_remove" aria-label="Delete todo"></buttom>
+                    </div>
+                </div>
+            </div>
+            <div class="todos-list_item">
+                <div class="custom-checkbox todos-list_item_ready-marker">
+                    <input type="checkbox" class="custom-checkbox_target" aria-label="Mark todo as ready" />
+                    <div class="custom-checkbox_visual">
+                        <div class="custom-checkbox_visual_icon"></div>
+                    </div>
+                </div>
+                <div class="todos-list_item_text-w">
+                    <div class="todos-list_item_text" contenteditable="true">JS</div>
+                </div>
+                <div class = "todos-list_item_remove-action">
+                    <div class = "todos-list_item_remove-action-fix">
+                        <buttom class="todos-list_item_remove" aria-label="Delete todo"></buttom>
+                    </div>
+                </div>
+            </div>
+            <div class="todos-list_item">
+                <div class="custom-checkbox todos-list_item_ready-marker">
+                    <input type="checkbox" class="custom-checkbox_target" aria-label="Mark todo as ready" />
+                    <div class="custom-checkbox_visual">
+                        <div class="custom-checkbox_visual_icon"></div>
+                    </div>
+                </div>
+                <div class="todos-list_item_text-w">
+                    <div class="todos-list_item_text" contenteditable="true">CSS</div>
+                </div>
+                <div class = "todos-list_item_remove-action">
+                    <div class = "todos-list_item_remove-action-fix">
+                        <buttom class="todos-list_item_remove" aria-label="Delete todo"></buttom>
+                    </div>
+                </div>
+            </div>
+            <div class="todos-list_item">
+                <div class="custom-checkbox todos-list_item_ready-marker">
+                    <input type="checkbox" class="custom-checkbox_target" aria-label="Mark todo as ready" />
+                    <div class="custom-checkbox_visual">
+                        <div class="custom-checkbox_visual_icon"></div>
+                    </div>
+                </div>
+                <div class="todos-list_item_text-w">
+                    <div class="todos-list_item_text" contenteditable="true">Java One Love</div>
+                </div>
+                <div class = "todos-list_item_remove-action">
+                    <div class = "todos-list_item_remove-action-fix">
+                        <buttom class="todos-list_item_remove" aria-label="Delete todo"></buttom>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="todos-toolbar">
+            <div class="todos-toolbar_unready-counter">3 items left</div>
+
+            <div class="todos-toolbar_filters">
+                <button class="todos-toolbar_filters-item" aria-label="Filter: All, is selected">All</button>
+                <button class="todos-toolbar_filters-item" aria-label="Filter: Active">Active</button>
+                <button class="todos-toolbar_filters-item" aria-label="Filter: Completed">Completed</button>
+            </div>
+
+            <button class="todos-toolbar_clear-completed">Clear completed</button>
+
+        </div>
+
+    </div>
+</div>
+
+</body>
