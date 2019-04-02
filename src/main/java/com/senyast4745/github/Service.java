@@ -4,13 +4,11 @@ package com.senyast4745.github;
 import com.senyast4745.github.dao.ToDoDOA;
 import com.senyast4745.github.model.ToDo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.List;
 
 @Controller
 public class Service {
@@ -28,6 +26,7 @@ public class Service {
     @RequestMapping("/")
     public String index() {
         return "index";
+
     }
 
     //TODO
@@ -39,66 +38,67 @@ public class Service {
     // application сканирует весь путь
     // и по callback вызывется нужный метод
 
-    @RequestMapping("/hw2")
-    public String indexSecond() {
-        return "index2";
-    }
+
     //http://localhost:8080/create?description=12 -
     // запрос  + (?key=value&key2=value ... )
     // запрос по GET (нельзя изменять структуру сервера, небезопасно)
    /* @RequestMapping ("/create")
     public @ResponseBody
-    oDo create(@RequestParam String description){
+    ToDo create(@RequestParam String description){
         return dao.create(description);
     }*/
 
     //http по POST
-    @RequestMapping(value = "/create", method = RequestMethod.POST)
+    @RequestMapping(value = "/create", method = RequestMethod.GET)
     public @ResponseBody
-    ToDo create(@RequestParam String description) {
-        return dao.create(description);
+    ResponseEntity<ToDo> create(@RequestParam String description) {
+        if (description.trim().length() == 0)
+            return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(dao.create(description));
     }
 
     @RequestMapping(value = "/read", method = RequestMethod.GET)
     public @ResponseBody
-    ToDo read(@RequestParam long id) {
+    ResponseEntity<ToDo> read(@RequestParam long id) {
         ToDo toDo = dao.read(id);
         if (toDo != null)
-            return toDo;
-        throw new IllegalArgumentException("toDo with id=" + " not exists");
+            return ResponseEntity.ok(toDo);
+        return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @RequestMapping(value = "/delete", method = RequestMethod.GET)
     public @ResponseBody
-    String delete(@RequestParam long id) {
+    ResponseEntity<Void> delete(@RequestParam long id) {
         if (!dao.delete(id)) {
-            throw new IllegalArgumentException("can't delete toDo with id=" + id);
+            return ResponseEntity.badRequest().build();
         }
-        return "200 OK";
+        return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    @RequestMapping(value = "/update", method = RequestMethod.GET)
     public @ResponseBody
-    ToDo update(@RequestParam long id, @RequestParam String description) {
+    ResponseEntity<ToDo> update(@RequestParam long id, @RequestParam String description) {
         ToDo toDo = dao.update(id, description);
         if (toDo != null)
-            return toDo;
-        throw new IllegalArgumentException("toDo with id=" + id + " can't update");
-
+            return ResponseEntity.ok(toDo);
+        return ResponseEntity.notFound().build();
     }
 
     @RequestMapping(value = "/showAll", method = RequestMethod.GET)
     public @ResponseBody
-    ConcurrentLinkedDeque<ToDo> showAll() {
-        return dao.showAll();
+    ResponseEntity<List<ToDo>> showAll() {
+        if(dao.showAll().size() == 0){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(dao.showAll());
     }
 
-    @RequestMapping(value = "/clearAll", method = RequestMethod.POST)
+    @RequestMapping(value = "/clearAll", method = RequestMethod.GET)
     public @ResponseBody
-    String clearAll() {
+    ResponseEntity<Void> clearAll() {
         if (dao.clearList())
-            return "200 OK";
-        throw new IllegalArgumentException("toDosList can't clear");
+            return ResponseEntity.ok().build();
+        return ResponseEntity.notFound().build();
     }
 
 }

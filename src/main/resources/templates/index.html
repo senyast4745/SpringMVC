@@ -1,10 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Spring Web</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8">
+    <title>Simple ToDo</title>
 </head>
 <body>
-<p>Hello World</p>
+<p>Create new todo</p>
+<form method="get" action="/create">
+    <p><input type="text" name="description" placeholder="description"></p>
+    <input type="submit" value="Create"/>
+</form>
+<p>Read all todos</p>
+<form method="get" action="/showAll">
+    <p><input type="submit" value="Read"/></p>
+</form>
+<p>Update todo</p>
+<form method="get" action="/update">
+    <p><input type="number" name="id" placeholder="id"/></p>
+    <p><input type="text" name="description" placeholder="description"/></p>
+    <input type="submit" value="Update"/>
+</form>
+<p>Delete todo by id</p>
+<form method="get" action="/delete">
+    <p><input type="number" name="id" placeholder="id"/></p>
+    <input type="submit" value="Delete"/>
+</form>
+
+<p>Clear todos list</p>
+<form method="get" action="/clearAll">
+    <input type="submit" value="Clear All"/>
+</form>
 </body>
 </html>
