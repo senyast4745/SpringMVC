@@ -18,7 +18,7 @@ public class ToDoDOA {
 
     public ToDo create(String description) {
         long id = counter.incrementAndGet();
-        ToDo toDo = new ToDo(id, description);
+        ToDo toDo = new ToDo(id, description, false);
         allToDos.add(toDo);
         //String desc = String.format(template, id);
         return toDo;
@@ -48,14 +48,15 @@ public class ToDoDOA {
         }
     }
 
-    public ToDo update(long id, String description) {
-        if (delete(id)) {
-            ToDo toDo = new ToDo(id, description);
-            allToDos.add(toDo);
-            return toDo;
-        } else {
-            return null;
+    public ToDo update(long id, String description, boolean checked) {
+        ToDo newTodo = null;
+        for (ToDo toDo : allToDos) {
+            if (toDo.getId() == id) {
+                newTodo = toDo;
+                toDo.setChecked(checked);
+            }
         }
+        return newTodo;
     }
 
     public List<ToDo> showAll() {

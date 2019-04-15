@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RequestMapping("/todo")
+@RestController
 public class Service {
 
     //@Autowired may (dependency injection)
@@ -23,12 +24,6 @@ public class Service {
         this.dao = dao;
     }
 
-    @RequestMapping("/")
-    public String index() {
-        return "index";
-
-    }
-
     //TODO
     //create (POST)
     //read(id) (GET)
@@ -37,7 +32,6 @@ public class Service {
 
     // application сканирует весь путь
     // и по callback вызывется нужный метод
-
 
     //http://localhost:8080/create?description=12 -
     // запрос  + (?key=value&key2=value ... )
@@ -49,7 +43,7 @@ public class Service {
     }*/
 
     //http по POST
-    @RequestMapping(value = "/create", method = RequestMethod.GET)
+    @RequestMapping( method = RequestMethod.POST)
     public @ResponseBody
     ResponseEntity<ToDo> create(@RequestParam String description) {
         if (description.trim().length() == 0)
@@ -57,16 +51,16 @@ public class Service {
         return ResponseEntity.ok(dao.create(description));
     }
 
-    @RequestMapping(value = "/read", method = RequestMethod.GET)
+    @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<ToDo> read(@RequestParam long id) {
+    ResponseEntity<ToDo> read(@PathVariable long id) {
         ToDo toDo = dao.read(id);
         if (toDo != null)
             return ResponseEntity.ok(toDo);
         return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping(value = "/delete", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.DELETE)
     public @ResponseBody
     ResponseEntity<Void> delete(@RequestParam long id) {
         if (!dao.delete(id)) {
@@ -75,16 +69,16 @@ public class Service {
         return ResponseEntity.ok().build();
     }
 
-    @RequestMapping(value = "/update", method = RequestMethod.GET)
+    @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    ResponseEntity<ToDo> update(@RequestParam long id, @RequestParam String description) {
-        ToDo toDo = dao.update(id, description);
+    ResponseEntity<ToDo> update(@PathVariable long id, @RequestParam String description, @RequestParam boolean checked) {
+        ToDo toDo = dao.update(id, description, checked);
         if (toDo != null)
             return ResponseEntity.ok(toDo);
         return ResponseEntity.notFound().build();
     }
 
-    @RequestMapping(value = "/showAll", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity<List<ToDo>> showAll() {
         if(dao.showAll().size() == 0){
@@ -93,7 +87,7 @@ public class Service {
         return ResponseEntity.ok(dao.showAll());
     }
 
-    @RequestMapping(value = "/clearAll", method = RequestMethod.GET)
+    @RequestMapping (value = "/clear", method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity<Void> clearAll() {
         if (dao.clearList())
