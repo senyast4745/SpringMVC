@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://ww.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Todo</title>
@@ -21,16 +21,16 @@
             </div>
         </form>
 
-        <div class="todos-list">
-            <!--<div class="todos-list_item">
+        <div class="todos-list" th:if="${data != null && data.length > 0}">
+            <div class="todos-list_item" th:each="it : ${data}">
                 <div class="custom-checkbox todos-list_item_ready-marker">
-                    <input type="checkbox" class="custom-checkbox_target" aria-label="Mark todo as ready" />
+                    <input type="checkbox" th:checked="${it.isChecked()}" class="custom-checkbox_target" aria-label="Mark todo as ready" />
                     <div class="custom-checkbox_visual">
                         <div class="custom-checkbox_visual_icon"></div>
                     </div>
                 </div>
                     <div class="todos-list_item_text-w">
-                        <div class="todos-list_item_text" contenteditable="true">HTML</div>
+                        <div class="todos-list_item_text" contenteditable="true" th:text="${it.getDescription()}">Text</div>
                     </div>
                 <div class = "todos-list_item_remove-action">
                     <div class = "todos-list_item_remove-action-fix">
@@ -38,7 +38,8 @@
                     </div>
                 </div>
             </div>
-            <div class="todos-list_item">
+
+            <!--<div class="todos-list_item">
                 <div class="custom-checkbox todos-list_item_ready-marker">
                     <input type="checkbox" class="custom-checkbox_target" aria-label="Mark todo as ready" />
                     <div class="custom-checkbox_visual">

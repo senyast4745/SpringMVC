@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
     };
-    requestRead.open("GET", "http://localhost:8080/showAll", true);
+    requestRead.open("GET", "http://localhost:8080/todo/", true);
     requestRead.send(null);
     initialization();
 
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         for (let i = 0; i < itemsChecked.length; i++) {
             if (filter === 1 || filter === 2 && !itemsChecked[i].checked || filter === 3 && itemsChecked[i].checked) {
-                addItem(itemsChecked[i].textContent, itemsChecked[i].checked);
+                addItem(itemsChecked[i].description, itemsChecked[i].checked);
             }
             if (!itemsChecked[i].checked) {
                 unreadyCounter++;
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function initialization() {
         for (let i = 0; i < itemsChecked.length; i++) {
-            addItem(itemsChecked[i].textContent, itemsChecked[i].checked)
+            addItem(itemsChecked[i].description, itemsChecked[i].checked)
         }
 
 
@@ -112,8 +112,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.preventDefault();
                 var item = this.closest('.todos-list_item');
                 var textItem = item.querySelector('.todos-list_item_text');
-                deleteEl(textItem.textContent);
-                removeByText(textItem.textContent.trim());
+                deleteEl(textItem.description);
+                removeByText(textItem.description.trim());
                 list.removeChild(item);
 
             }
@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.preventDefault();
                 let item = this.closest('.todos-list_item');
                 let textItem = item.querySelector('.todos-list_item_text');
-                changeChecked(textItem.textContent);
+                changeChecked(textItem.description);
                 redraw();
 
 
@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (text.length > 0) {
                 input.value = "";
                 var index = itemsChecked.length;
-                itemsChecked[index] = {textContent: text, checked: false};
+                itemsChecked[index] = {description: text, checked: false};
                 addItem(text, false);
                 redraw();
 
@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function removeByText(s) {
         for (let i = 0; i < itemsChecked.length; i++) {
-            if (itemsChecked[i].textContent === s) {
+            if (itemsChecked[i].description === s) {
                 itemsChecked.splice(i, 1);
                 return;
             }
@@ -180,10 +180,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function changeChecked(s) {
         for (let i = 0; i < itemsChecked.length; i++) {
-            if (itemsChecked[i].textContent === s) {
+            if (itemsChecked[i].description === s) {
                 itemsChecked[i].checked = !itemsChecked[i].checked;
                 var formData = new FormData();
-                formData.append("description", itemsChecked[i].textContent);
+                formData.append("description", itemsChecked[i].description);
                 formData.append("checked", itemsChecked[i].checked);
                 var updateRequest = new XMLHttpRequest();
                 updateRequest.onreadystatechange = function () {
@@ -209,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function deleteEl(s){
         for (let i = 0; i < itemsChecked.length; i++) {
-            if (itemsChecked[i].textContent === s) {
+            if (itemsChecked[i].description === s) {
                 let index = itemsChecked[i].id;
                 var formData = new FormData();
                 formData.append("id", index)
@@ -243,7 +243,7 @@ document.addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
             for (let i = 0; i < itemsChecked.length; i++) {
                 if (itemsChecked[i].checked) {
-                    deleteEl(itemsChecked[i].textContent);
+                    deleteEl(itemsChecked[i].description);
                     itemsChecked.splice(i, 1);
                     i--;
                 }

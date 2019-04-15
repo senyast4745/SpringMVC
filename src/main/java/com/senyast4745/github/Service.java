@@ -1,11 +1,10 @@
 package com.senyast4745.github;
 
 
-import com.senyast4745.github.dao.ToDoDOA;
+import com.senyast4745.github.dao.ToDoDAO;
 import com.senyast4745.github.model.ToDo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,12 +14,12 @@ import java.util.List;
 public class Service {
 
     //@Autowired may (dependency injection)
-    private ToDoDOA dao;
+    private ToDoDAO dao;
 
     //Read about Autowired
 
     @Autowired
-    public Service(ToDoDOA dao) {
+    public Service(ToDoDAO dao) {
         this.dao = dao;
     }
 

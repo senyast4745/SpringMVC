@@ -11,10 +11,16 @@ import java.util.concurrent.atomic.AtomicLong;
 
 //Create only one exemplar (like singleton) так что нужно обратиться к этому компоненте  использовать Autowired
 @Component
-public class ToDoDOA {
+public class ToDoDAO {
     //private static final String template = "ToDo #%d";
     private static List<ToDo> allToDos = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong();
+
+    public ToDoDAO() {
+        allToDos.add(new ToDo(counter.getAndIncrement(), "Java", false));
+        allToDos.add(new ToDo(counter.getAndIncrement(), "one", false));
+        allToDos.add(new ToDo(counter.getAndIncrement(), "Love", false));
+    }
 
     public ToDo create(String description) {
         long id = counter.incrementAndGet();
