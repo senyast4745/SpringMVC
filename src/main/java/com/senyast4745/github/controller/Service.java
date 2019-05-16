@@ -1,4 +1,4 @@
-package com.senyast4745.github;
+package com.senyast4745.github.controller;
 
 
 import com.senyast4745.github.dao.ToDoDAO;
@@ -42,18 +42,18 @@ public class Service {
     }*/
 
     //http по POST
-    @RequestMapping( method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
-    ResponseEntity<ToDo> create(@RequestParam String description) {
+    ResponseEntity<ToDo> create(@RequestParam String description, @RequestBody String userName) {
         if (description.trim().length() == 0)
             return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(dao.create(description));
+        return ResponseEntity.ok(dao.create(description, userName));
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<ToDo> read(@PathVariable long id) {
-        ToDo toDo = dao.read(id);
+    ResponseEntity<ToDo> read(@PathVariable long id, @RequestBody String userName) {
+        ToDo toDo = dao.read(id, userName);
         if (toDo != null)
             return ResponseEntity.ok(toDo);
         return ResponseEntity.notFound().build();
@@ -61,8 +61,8 @@ public class Service {
 
     @RequestMapping(method = RequestMethod.DELETE)
     public @ResponseBody
-    ResponseEntity<Void> delete(@RequestParam long id) {
-        if (!dao.delete(id)) {
+    ResponseEntity<Void> delete(@RequestParam long id, @RequestBody String userName) {
+        if (!dao.delete(id, userName)) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
@@ -70,8 +70,8 @@ public class Service {
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    ResponseEntity<ToDo> update(@PathVariable long id, @RequestParam String description, @RequestParam boolean checked) {
-        ToDo toDo = dao.update(id, description, checked);
+    ResponseEntity<ToDo> update(@PathVariable long id, @RequestBody String userName, @RequestParam String description, @RequestParam boolean checked) {
+        ToDo toDo = dao.update(id, userName,description, checked);
         if (toDo != null)
             return ResponseEntity.ok(toDo);
         return ResponseEntity.notFound().build();
@@ -79,17 +79,17 @@ public class Service {
 
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<List<ToDo>> showAll() {
-        if(dao.showAll().size() == 0){
+    ResponseEntity<List<ToDo>> showAll(@RequestBody String userName) {
+        if (dao.showAll(userName).size() == 0) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(dao.showAll());
+        return ResponseEntity.ok(dao.showAll(userName));
     }
 
-    @RequestMapping (value = "/clear", method = RequestMethod.GET)
+    @RequestMapping(value = "/clear", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<Void> clearAll() {
-        if (dao.clearList())
+    ResponseEntity<Void> clearAll(@RequestBody String userName) {
+        if (dao.clearList(userName))
             return ResponseEntity.ok().build();
         return ResponseEntity.notFound().build();
     }

@@ -1,5 +1,8 @@
 console.log('init');
 
+const token = getMeta("_csrf");
+const header = getMeta("_csrf_header");
+
 
 document.addEventListener("DOMContentLoaded", function () {
     let input = document.querySelector('.todo-creator_text-input');
@@ -148,6 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var formData = new FormData();
                 formData.append("description", text);
                 var createRequest = new XMLHttpRequest();
+                createRequest.setRequestHeader(header,token);
                 createRequest.onreadystatechange = function () {
                     if (createRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
@@ -186,6 +190,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 formData.append("description", itemsChecked[i].description);
                 formData.append("checked", itemsChecked[i].checked);
                 var updateRequest = new XMLHttpRequest();
+                updateRequest.setRequestHeader(header,token);
                 updateRequest.onreadystatechange = function () {
                     if (updateRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
@@ -214,6 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 var formData = new FormData();
                 formData.append("id", index)
                 var deleteRequest = new XMLHttpRequest();
+                deleteRequest.setRequestHeader(header,token);
                 deleteRequest.onreadystatechange = function () {
                     if (deleteRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
