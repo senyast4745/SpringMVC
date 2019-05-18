@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -47,17 +48,15 @@ public class ToDoDAO {
 
     }
 
+    @Transactional
     public boolean delete(long id, String userName) {
         return toDoRepository.deleteByIdAndUserName(id, userName).orElseThrow(() -> new IllegalArgumentException("todo with id " + id + " not found")) != null;
 
     }
 
-    public ToDo update(long id, String userName, String description, boolean checked) {
-        checkDescription(description);
-        ToDo tmpTodo =  toDoRepository.findByIdAndUserName(id, userName).orElse(create("", userName));
-        tmpTodo.setDescription(description);
+    public ToDo update(long id, String userName ,boolean checked) {
+        ToDo tmpTodo =  toDoRepository.findByIdAndUserName(id, userName).orElseThrow(() -> new IllegalArgumentException("todo with id " + id + " not found"));
         tmpTodo.setChecked(checked);
-        toDoRepository.deleteByIdAndUserName(id, userName);
         return toDoRepository.save(tmpTodo);
     }
 
@@ -74,7 +73,7 @@ public class ToDoDAO {
         Matcher matcher = incorrectSymbols.matcher(description);
         if(matcher.find() || description.isEmpty() || description.length() > 50){
 
-            throw new IllegalArgumentException("your description doesn't satisfy the specific parameters: " +
+            throw new IllegalArgumentException("your description: " + description + " doesn't satisfy the specific parameters: " +
                     "Description mustn't be empty, " +
                     "length of description mustn't be more then 50 symbols a" +
                     "nd descriptions mustn't contains symbols: \"+\", \"-\", \"<\"," +

@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.preventDefault();
                 const item = this.closest('.todos-list_item');
                 const textItem = item.querySelector('.todos-list_item_text');
-                deleteEl(textItem.description);
-                removeByText(textItem.description);
+                deleteEl(textItem.innerText);
+                removeById(textItem.innerText);
                 list.removeChild(item);
 
             }
@@ -142,8 +142,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 e.preventDefault();
                 let item = this.closest('.todos-list_item');
                 let textItem = item.querySelector('.todos-list_item_text');
-                console.log("Something must be checked " + textItem.description);
-                changeChecked(textItem.description);
+                console.log("Something must be checked " + textItem.innerText);
+                changeChecked(textItem.innerText);
                 redraw();
 
 
@@ -165,6 +165,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const formData = new FormData();
                 formData.append("description", text);
                 const createRequest = new XMLHttpRequest();
+                createRequest.open("POST", "http://localhost:8080/todo");
+                createRequest.setRequestHeader(header,token);
+                createRequest.send(formData);
                 createRequest.onreadystatechange = function () {
                     if (createRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
@@ -178,16 +181,14 @@ document.addEventListener("DOMContentLoaded", function () {
                     } else {
                     }
                 };
-                createRequest.open("POST", "http://localhost:8080/todo");
-                createRequest.setRequestHeader(header,token);
-                createRequest.send(formData);
+
 
             }
         }
 
     });
 
-    function removeByText(s) {
+    function removeById(s) {
         for (let i = 0; i < itemsChecked.length; i++) {
             if (itemsChecked[i].description === s) {
                 itemsChecked.splice(i, 1);
@@ -198,22 +199,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function changeChecked(s) {
         for (let i = 0; i < itemsChecked.length; i++) {
-            console.log("checkbox clicked "  + s + ' ' + itemsChecked[i].description);
-
             if (itemsChecked[i].description === s) {
                 itemsChecked[i].checked = !itemsChecked[i].checked;
                 const formData = new FormData();
                 console.log("checkbox clicked");
-                formData.append("description", itemsChecked[i].description);
                 formData.append("checked", itemsChecked[i].checked);
                 let updateRequest = new XMLHttpRequest();
+                updateRequest.open("PUT", "http://localhost:8080/todo/" + itemsChecked[i].id );
+                updateRequest.setRequestHeader(header,token);
+                updateRequest.send(formData);
 
                 updateRequest.onreadystatechange = function () {
                     if (updateRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
                         if (updateRequest.status === 200) { // Perfect!
-                            //var responseCreate = JSON.parse(createRequest.responseText);
-
+                            var responseCreate = JSON.parse(updateRequest.responseText);
+                            itemsChecked[i].checked = responseCreate.checked;
                             console.log('good update');
                         } else {
 
@@ -221,9 +222,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     } else {
                     }
                 };
-                updateRequest.open("PUT", "http://localhost:8080/todo/" + itemsChecked[i].id );
-                updateRequest.setRequestHeader(header,token);
-                updateRequest.send(formData);
                 return itemsChecked[i].checked;
             }
         }
