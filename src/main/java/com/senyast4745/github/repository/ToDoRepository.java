@@ -14,5 +14,5 @@ public interface ToDoRepository extends CrudRepository<ToDo, Long> {
 
     Optional<List <ToDo>> findAllByUserName(String userName);
     Optional<List<ToDo>> deleteAllByUserName(String userName);
-
+    
 }

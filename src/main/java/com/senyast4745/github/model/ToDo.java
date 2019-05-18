@@ -23,6 +23,7 @@ public class ToDo {
     private String userName;
 
     public ToDo(){
+        super();
     }
 
     public ToDo(long id, String userName, String description, boolean checked) {

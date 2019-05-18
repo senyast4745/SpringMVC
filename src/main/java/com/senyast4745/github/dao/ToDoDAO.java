@@ -3,6 +3,9 @@ package com.senyast4745.github.dao;
 
 import com.senyast4745.github.model.ToDo;
 import com.senyast4745.github.repository.ToDoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,9 +15,13 @@ import java.util.regex.Pattern;
 
 //Create only one exemplar (like singleton) так что нужно обратиться к этому компоненте  использовать Autowired
 @Component
+//@Scope("singleton")
 public class ToDoDAO {
     //private static final String template = "ToDo #%d";
     private final AtomicLong counter = new AtomicLong();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToDoDAO.class);
+    private static final String LOG_TAG = ToDoDAO.class.getSimpleName();
 
     private final
     ToDoRepository toDoRepository;
@@ -30,6 +37,7 @@ public class ToDoDAO {
         checkDescription(description);
         long id = counter.incrementAndGet();
         ToDo toDo = new ToDo(id, userName, description, false);
+        LOGGER.info("Creating todo " + toDo.getUserName() + " " + toDo.getDescription());
         return toDoRepository.save(toDo);
     }
 

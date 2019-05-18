@@ -5,6 +5,7 @@ import com.senyast4745.github.dao.ToDoDAO;
 import com.senyast4745.github.model.ToDo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,16 +45,16 @@ public class Service {
     //http по POST
     @RequestMapping(method = RequestMethod.POST)
     public @ResponseBody
-    ResponseEntity<ToDo> create(@RequestParam String description, @RequestBody String userName) {
+    ResponseEntity<ToDo> create(@RequestParam String description, Authentication auth) {
         if (description.trim().length() == 0)
             return ResponseEntity.badRequest().build();
-        return ResponseEntity.ok(dao.create(description, userName));
+        return ResponseEntity.ok(dao.create(description, auth.getName()));
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<ToDo> read(@PathVariable long id, @RequestBody String userName) {
-        ToDo toDo = dao.read(id, userName);
+    ResponseEntity<ToDo> read(@PathVariable long id, Authentication auth) {
+        ToDo toDo = dao.read(id, auth.getName());
         if (toDo != null)
             return ResponseEntity.ok(toDo);
         return ResponseEntity.notFound().build();
@@ -61,8 +62,8 @@ public class Service {
 
     @RequestMapping(method = RequestMethod.DELETE)
     public @ResponseBody
-    ResponseEntity<Void> delete(@RequestParam long id, @RequestBody String userName) {
-        if (!dao.delete(id, userName)) {
+    ResponseEntity<Void> delete(@RequestParam long id, Authentication auth) {
+        if (!dao.delete(id,auth.getName())) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
@@ -70,8 +71,8 @@ public class Service {
 
     @RequestMapping(value = "{id}", method = RequestMethod.PUT)
     public @ResponseBody
-    ResponseEntity<ToDo> update(@PathVariable long id, @RequestBody String userName, @RequestParam String description, @RequestParam boolean checked) {
-        ToDo toDo = dao.update(id, userName,description, checked);
+    ResponseEntity<ToDo> update(@PathVariable long id, @RequestParam String description, @RequestParam boolean checked, Authentication auth) {
+        ToDo toDo = dao.update(id, auth.getName(),description, checked);
         if (toDo != null)
             return ResponseEntity.ok(toDo);
         return ResponseEntity.notFound().build();
@@ -79,17 +80,17 @@ public class Service {
 
     @RequestMapping(method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<List<ToDo>> showAll(@RequestBody String userName) {
-        if (dao.showAll(userName).size() == 0) {
+    ResponseEntity<List<ToDo>> showAll(Authentication auth) {
+        if (dao.showAll(auth.getName()).size() == 0) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(dao.showAll(userName));
+        return ResponseEntity.ok(dao.showAll(auth.getName()));
     }
 
     @RequestMapping(value = "/clear", method = RequestMethod.GET)
     public @ResponseBody
-    ResponseEntity<Void> clearAll(@RequestBody String userName) {
-        if (dao.clearList(userName))
+    ResponseEntity<Void> clearAll( Authentication auth) {
+        if (dao.clearList(auth.getName()))
             return ResponseEntity.ok().build();
         return ResponseEntity.notFound().build();
     }

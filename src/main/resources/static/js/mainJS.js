@@ -3,13 +3,25 @@ console.log('init');
 const token = getMeta("_csrf");
 const header = getMeta("_csrf_header");
 
+function getMeta(metaName) {
+    const metas = document.getElementsByTagName('meta');
+
+    for (let i = 0; i < metas.length; i++) {
+        if (metas[i].getAttribute('name') === metaName) {
+            console.log(metas[i].getAttribute('content'));
+            return metas[i].getAttribute('content');
+        }
+    }
+
+    return '';
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     let input = document.querySelector('.todo-creator_text-input');
     let list = document.querySelector('.todos-list');
     let buttonClear = document.querySelector('.todos-toolbar_clear-completed');
     let filters = document.querySelectorAll('.todos-toolbar_filters-item');
-    var filter = 1;
+    let filter = 1;
     let itemsChecked = [];
     let requestRead = new XMLHttpRequest();
     requestRead.onreadystatechange = function () {
@@ -21,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
     requestRead.open("GET", "http://localhost:8080/todo/", true);
+    requestRead.setRequestHeader(header,token);
     requestRead.send(null);
     initialization();
 
@@ -90,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
             + '</div>'
             + '</div>'
             + '<div class="todos-list_item_text-w">'
-            + '<div class="todos-list_item_text" contenteditable="true">' + description + '</div>'
+            + '<div class="todos-list_item_text" contenteditable="false">' + description + '</div>'
             + '</div>'
             + '<div class = "todos-list_item_remove-action">'
             + '<div class = "todos-list_item_remove-action-fix">'
@@ -102,33 +115,34 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (checked) {
             let items = list.querySelectorAll('.todos-list_item');
-            var textItem = items[items.length - 1].querySelector('.todos-list_item_text');
+            const textItem = items[items.length - 1].querySelector('.todos-list_item_text');
             textItem.style.color = 'grey';
             textItem.style.textDecoration = 'line-through';
         }
 
 
-        var removeItems = list.querySelectorAll('.todos-list_item_remove');
+        const removeItems = list.querySelectorAll('.todos-list_item_remove');
         removeItems[removeItems.length - 1].addEventListener(
             "click",
             function (e) {
                 e.preventDefault();
-                var item = this.closest('.todos-list_item');
-                var textItem = item.querySelector('.todos-list_item_text');
+                const item = this.closest('.todos-list_item');
+                const textItem = item.querySelector('.todos-list_item_text');
                 deleteEl(textItem.description);
-                removeByText(textItem.description.trim());
+                removeByText(textItem.description);
                 list.removeChild(item);
 
             }
         );
 
-        var checkBoxItems = list.querySelectorAll('.custom-checkbox_target');
+        const checkBoxItems = list.querySelectorAll('.custom-checkbox_target');
         checkBoxItems[checkBoxItems.length - 1].addEventListener(
             "click",
             function (e) {
                 e.preventDefault();
                 let item = this.closest('.todos-list_item');
                 let textItem = item.querySelector('.todos-list_item_text');
+                console.log("Something must be checked " + textItem.description);
                 changeChecked(textItem.description);
                 redraw();
 
@@ -140,25 +154,24 @@ document.addEventListener("DOMContentLoaded", function () {
     input.addEventListener("keydown", function (e) {
         if (e.keyCode === 13) {
             e.preventDefault();
-            var text = input.value.trim();
+            const text = input.value;
             if (text.length > 0) {
                 input.value = "";
-                var index = itemsChecked.length;
+                const index = itemsChecked.length;
                 itemsChecked[index] = {description: text, checked: false};
                 addItem(text, false);
                 redraw();
 
-                var formData = new FormData();
+                const formData = new FormData();
                 formData.append("description", text);
-                var createRequest = new XMLHttpRequest();
-                createRequest.setRequestHeader(header,token);
+                const createRequest = new XMLHttpRequest();
                 createRequest.onreadystatechange = function () {
                     if (createRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
                         if (createRequest.status === 200) { // Perfect!
-                            var responseCreate = JSON.parse(createRequest.responseText);
+                            const responseCreate = JSON.parse(createRequest.responseText);
                             itemsChecked[index].id = responseCreate.id;
-                            console.log('good create')
+                            console.log('good create ' + itemsChecked[index].description)
                         } else {
 
                         }
@@ -166,6 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 };
                 createRequest.open("POST", "http://localhost:8080/todo");
+                createRequest.setRequestHeader(header,token);
                 createRequest.send(formData);
 
             }
@@ -184,27 +198,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function changeChecked(s) {
         for (let i = 0; i < itemsChecked.length; i++) {
+            console.log("checkbox clicked "  + s + ' ' + itemsChecked[i].description);
+
             if (itemsChecked[i].description === s) {
                 itemsChecked[i].checked = !itemsChecked[i].checked;
-                var formData = new FormData();
+                const formData = new FormData();
+                console.log("checkbox clicked");
                 formData.append("description", itemsChecked[i].description);
                 formData.append("checked", itemsChecked[i].checked);
-                var updateRequest = new XMLHttpRequest();
-                updateRequest.setRequestHeader(header,token);
+                let updateRequest = new XMLHttpRequest();
+
                 updateRequest.onreadystatechange = function () {
                     if (updateRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
                         if (updateRequest.status === 200) { // Perfect!
                             //var responseCreate = JSON.parse(createRequest.responseText);
 
-                            console.log('good update')
+                            console.log('good update');
                         } else {
 
                         }
                     } else {
                     }
                 };
-                updateRequest.open("PUT", "http://localhost:8080/todo/" + itemsChecked[i].id);
+                updateRequest.open("PUT", "http://localhost:8080/todo/" + itemsChecked[i].id );
+                updateRequest.setRequestHeader(header,token);
                 updateRequest.send(formData);
                 return itemsChecked[i].checked;
             }
@@ -217,9 +235,9 @@ document.addEventListener("DOMContentLoaded", function () {
             if (itemsChecked[i].description === s) {
                 let index = itemsChecked[i].id;
                 var formData = new FormData();
-                formData.append("id", index)
-                var deleteRequest = new XMLHttpRequest();
-                deleteRequest.setRequestHeader(header,token);
+                formData.append("id", index);
+                let deleteRequest = new XMLHttpRequest();
+
                 deleteRequest.onreadystatechange = function () {
                     if (deleteRequest.readyState === XMLHttpRequest.DONE) {
                         // Everything is good, the response was received.
@@ -234,6 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     }
                 };
                 deleteRequest.open("DELETE", "http://localhost:8080/todo/");
+                deleteRequest.setRequestHeader(header,token);
                 deleteRequest.send(formData);
                 return itemsChecked[i].checked;
             }
