@@ -2,75 +2,86 @@ package com.senyast4745.github.dao;
 
 
 import com.senyast4745.github.model.ToDo;
-import org.springframework.boot.web.server.AbstractConfigurableWebServerFactory;
+import com.senyast4745.github.repository.ToDoRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //Create only one exemplar (like singleton) так что нужно обратиться к этому компоненте  использовать Autowired
 @Component
+//@Scope("singleton")
 public class ToDoDAO {
     //private static final String template = "ToDo #%d";
-    private static List<ToDo> allToDos = new ArrayList<>();
     private final AtomicLong counter = new AtomicLong();
 
-    public ToDoDAO() {
-        allToDos.add(new ToDo(counter.getAndIncrement(), "Java", false));
-        allToDos.add(new ToDo(counter.getAndIncrement(), "one", false));
-        allToDos.add(new ToDo(counter.getAndIncrement(), "Love", false));
+    private static final Logger LOGGER = LoggerFactory.getLogger(ToDoDAO.class);
+    private static final String LOG_TAG = ToDoDAO.class.getSimpleName();
+
+    private final
+    ToDoRepository toDoRepository;
+
+    public ToDoDAO(ToDoRepository toDoRepository) {
+        this.toDoRepository = toDoRepository;
+        this.toDoRepository.save(new ToDo(counter.getAndIncrement(), "first", "Java", false));
+        this.toDoRepository.save(new ToDo(counter.getAndIncrement(), "second", "one", false));
+        this.toDoRepository.save(new ToDo(counter.getAndIncrement(), "second", "Love", false));
     }
 
-    public ToDo create(String description) {
+    public ToDo create(String description, String userName) {
+        checkDescription(description);
+        if(toDoRepository.findAllByDescriptionAndUserName(description, userName).isPresent()){
+            throw new IllegalArgumentException("todo with this description exists");
+        }
         long id = counter.incrementAndGet();
-        ToDo toDo = new ToDo(id, description, false);
-        allToDos.add(toDo);
-        //String desc = String.format(template, id);
-        return toDo;
+        ToDo toDo = new ToDo(id, userName, description, false);
+        LOGGER.info("Creating todo " + toDo.getUserName() + " " + toDo.getDescription());
+        return toDoRepository.save(toDo);
     }
 
-    public ToDo read(long id) {
-        for (ToDo toDo : allToDos) {
-            if (toDo.getId() == id) {
-                return toDo;
-            }
+
+    public ToDo read(long id, String userName) {
+        return toDoRepository.findByIdAndUserName(id, userName).orElse(new ToDo(counter.getAndIncrement(), userName, "", false));
+
+    }
+
+    @Transactional
+    public boolean delete(long id, String userName) {
+        return toDoRepository.deleteByIdAndUserName(id, userName).orElseThrow(() -> new IllegalArgumentException("todo with id " + id + " not found")) != null;
+
+    }
+
+    public ToDo update(long id, String userName ,boolean checked) {
+        ToDo tmpTodo =  toDoRepository.findByIdAndUserName(id, userName).orElseThrow(() -> new IllegalArgumentException("todo with id " + id + " not found"));
+        tmpTodo.setChecked(checked);
+        return toDoRepository.save(tmpTodo);
+    }
+
+    public List<ToDo> showAll(String userName) {
+        return toDoRepository.findAllByUserName(userName).orElseThrow(() -> new IllegalArgumentException("your todos list is empty"));
+    }
+
+    public boolean clearList(String userName) {
+        return toDoRepository.deleteAllByUserName(userName).orElseThrow(() -> new IllegalArgumentException("your todos list is already empty")) != null;
+    }
+
+    private void checkDescription(String description){
+        Pattern incorrectSymbols = Pattern.compile("[-+<>=*@#$%^&]");
+        Matcher matcher = incorrectSymbols.matcher(description);
+        if(matcher.find() || description.isEmpty() || description.length() > 50){
+
+            throw new IllegalArgumentException("your description: " + description + " doesn't satisfy the specific parameters: " +
+                    "Description mustn't be empty, " +
+                    "length of description mustn't be more then 50 symbols a" +
+                    "nd descriptions mustn't contains symbols: \"+\", \"-\", \"<\"," +
+                    " \">\", \"=\", \"*\", \"@\", \"#\", \"$\", \"%\", \"^\", \"&\".");
         }
-        return null;
-    }
 
-    public boolean delete(long id) {
-        ToDo toDoDel = null;
-        for (ToDo toDo : allToDos) {
-            if (toDo.getId() == id) {
-                toDoDel = toDo;
-            }
-        }
-        if (toDoDel != null) {
-            allToDos.remove(toDoDel);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public ToDo update(long id, String description, boolean checked) {
-        ToDo newTodo = null;
-        for (ToDo toDo : allToDos) {
-            if (toDo.getId() == id) {
-                newTodo = toDo;
-                toDo.setChecked(checked);
-            }
-        }
-        return newTodo;
-    }
-
-    public List<ToDo> showAll() {
-        return allToDos;
-    }
-
-    public boolean clearList() {
-        allToDos.clear();
-        return allToDos.size() == 0;
     }
 }
