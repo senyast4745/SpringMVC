@@ -10,9 +10,13 @@ import java.util.Optional;
 @Repository
 public interface ToDoRepository extends CrudRepository<ToDo, Long> {
     Optional<ToDo> findByIdAndUserName(long id, String userName);
+
     Optional<ToDo> deleteByIdAndUserName(long id, String userName);
 
-    Optional<List <ToDo>> findAllByUserName(String userName);
+    Optional<List<ToDo>> findAllByUserName(String userName);
+
+    Optional<List<ToDo>> findAllByDescriptionAndUserName(String description, String username);
+
     Optional<List<ToDo>> deleteAllByUserName(String userName);
-    
+
 }

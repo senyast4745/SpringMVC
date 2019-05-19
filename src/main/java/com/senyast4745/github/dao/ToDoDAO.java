@@ -36,6 +36,9 @@ public class ToDoDAO {
 
     public ToDo create(String description, String userName) {
         checkDescription(description);
+        if(toDoRepository.findAllByDescriptionAndUserName(description, userName).isPresent()){
+            throw new IllegalArgumentException("todo with this description exists");
+        }
         long id = counter.incrementAndGet();
         ToDo toDo = new ToDo(id, userName, description, false);
         LOGGER.info("Creating todo " + toDo.getUserName() + " " + toDo.getDescription());
@@ -79,5 +82,6 @@ public class ToDoDAO {
                     "nd descriptions mustn't contains symbols: \"+\", \"-\", \"<\"," +
                     " \">\", \"=\", \"*\", \"@\", \"#\", \"$\", \"%\", \"^\", \"&\".");
         }
+
     }
 }

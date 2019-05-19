@@ -50,7 +50,13 @@ public class Service {
         if (description.trim().length() == 0) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(dao.create(description, auth.getName()));
+        ToDo tmp;
+        try {
+            tmp = dao.create(description, auth.getName());
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(tmp);
     }
 
     @RequestMapping(value = "{id}", method = RequestMethod.GET)

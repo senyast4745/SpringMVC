@@ -16,6 +16,21 @@ function getMeta(metaName) {
     return '';
 }
 
+function isValid(s){
+    if(s.length > 50) {
+        return false;
+    }
+
+    let badSigns = "@#-+$=*^&%<>";
+    for (let i = 0; i < badSigns.length; i++){
+        if(s.indexOf(badSigns[i]) > -1){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     let input = document.querySelector('.todo-creator_text-input');
     let list = document.querySelector('.todos-list');
@@ -157,10 +172,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const text = input.value;
             if (text.length > 0) {
                 input.value = "";
-                const index = itemsChecked.length;
-                itemsChecked[index] = {description: text, checked: false};
-                addItem(text, false);
-                redraw();
+                if(!isValid(text)){
+                    alert("Input data is not valid");
+                    return;
+                }
 
                 const formData = new FormData();
                 formData.append("description", text);
@@ -173,9 +188,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         // Everything is good, the response was received.
                         if (createRequest.status === 200) { // Perfect!
                             const responseCreate = JSON.parse(createRequest.responseText);
-                            itemsChecked[index].id = responseCreate.id;
+
+
+                            const index = itemsChecked.length;
+                            itemsChecked[index] = {description: responseCreate.description, checked: responseCreate.checked, id: responseCreate.id};
+                            addItem(text, false);
                             console.log('good create ' + itemsChecked[index].description)
-                        } else {
+                            redraw();
+                        } else { if (createRequest.status === 400)
+                        {
+                            alert("Incorrect data");
+                        }
 
                         }
                     } else {
@@ -274,6 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
             redraw();
         }
     )
+
 
 })
 ;
